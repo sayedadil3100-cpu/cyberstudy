@@ -1,6 +1,6 @@
 # Cyberstudy
 
-A BCA cybersecurity learning dashboard by Syed Adil.
+A cybersecurity learning dashboard by Syed Adil.
 
 - Twelve chapters from basic to advanced, with summaries and self-checks
 - Interactive cybersecurity career roles
