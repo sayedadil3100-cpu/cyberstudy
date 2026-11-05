@@ -1,0 +1,22 @@
+// Presentation only: app.js continues to own study state and scoring.
+const studyRender=render;
+render=function(){
+  if(page!=='home'){studyRender();return}
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  document.getElementById('badge').textContent=state.wrong.length;
+  const nextChapter=chapters.findIndex((_,i)=>!state.chaptersDone.includes(i));
+  const chapter=nextChapter<0?0:nextChapter;
+  document.getElementById('app').innerHTML=`
+  <section class="welcome"><div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> YOUR NEXT CHAPTER STARTS HERE</div><h1>Build your<br>security <em>mindset.</em></h1><p>From your first Linux command to understanding real threats. A clear path, a little practice, and progress that stays with you.</p><div class="hero-actions">${btn('Explore the roadmap ↗',"navigate('chapters')")}${btn(state.active?.answers.length?'Resume practice →':'Start your daily four →',"navigate('daily')",'secondary')}</div><div class="hero-foot">SELF-PACED <span> / </span> BEGINNER TO ADVANCED</div></div>
+  <div class="pathvisual" aria-label="Three stages: build the basics, learn to defend, apply your skills"><div class="visual-label">// THE LEARNING PATH <span>01 — 03</span></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="path-node node-one"><span>01 / FOUNDATION</span><strong>Build the basics</strong><small>Linux · networks · the web</small></div><div class="path-node node-two"><span>02 / DEFENCE</span><strong>Learn to protect</strong><small>Identity · threats · cryptography</small></div><div class="path-node node-three"><span>03 / APPLICATION</span><strong>Think like a defender</strong><small>Incidents · risk · practical scenarios</small></div><div class="visual-bottom"><i></i> KNOWLEDGE → PRACTICE → CONFIDENCE</div></div></section>
+  <div class="catalog-stats">${[['12','Chapters'],['36','Topic summaries'],['36','Practice questions'],['07','Career roles']].map(([n,t])=>`<div><strong>${n}</strong><span>${t}</span></div>`).join('')}</div>
+  <div class="section-title"><div><div class="eyebrow">// YOUR WORKSPACE</div><h2>Make today count.</h2></div><span class="notice">A little, every day.</span></div>
+  <div class="workspace-grid"><section class="card continue-card"><div class="eyebrow">${state.chaptersDone.length===12?'REVISIT YOUR FOUNDATIONS':'CONTINUE LEARNING'}</div><span class="chapter-number">${String(chapter+1).padStart(2,'0')}</span><h2>${chapters[chapter].title}</h2><p>${chapters[chapter].summary}</p><div class="bar"><div style="width:${state.chaptersDone.length/12*100}%"></div></div><div class="actions"><small>${state.chaptersDone.length} / 12 chapters complete</small>${btn('Open chapter ↗','openChapter('+chapter+')','secondary')}</div></section>
+  <section class="card practice-card"><div class="eyebrow">DAILY PRACTICE</div><div class="big-number">04<span>questions. One stronger foundation.</span></div><p>Concepts and scenarios, with simple explanations and useful exam points.</p>${btn(state.active?.answers.length?'Pick up where you left off →':'Let’s practise →',"navigate('daily')")}</section>
+  <section class="card review-card"><div class="eyebrow">CLOSE THE GAPS</div><div class="big-number">${String(state.wrong.length).padStart(2,'0')}<span>concepts to revisit</span></div><p>${state.wrong.length?'Your mistakes are a useful map. Give these questions another try.':'A clear review queue. Missed questions will appear here as you practise.'}</p>${btn('Open review →',"navigate('review')",'secondary')}</section></div>
+  <div class="section-title"><div><div class="eyebrow">// THE BIGGER PICTURE</div><h2>Your effort, made visible.</h2></div>${btn('View progress ↗',"navigate('progress')",'secondary')}</div>${stats()}
+  <section class="profile-strip"><div><span class="eyebrow">BUILT FOR CURIOUS MINDS</span><p>Learn the foundations. Explore the roles. Find your path.</p></div><div><a href="https://github.com/sayedadil3100-cpu" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/syed-adil-4a05133a6/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></div></section>`;
+};
+const studyNavigate=navigate;
+navigate=function(p){studyNavigate(p);window.scrollTo({top:0,behavior:'instant'});document.getElementById('app').focus({preventScroll:true})};
+page='home';render();
