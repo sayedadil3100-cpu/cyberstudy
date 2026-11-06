@@ -1,0 +1,22 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const els={};
+const nav=['home','chapters','labs','certifications','daily','review','progress'].map(page=>({dataset:{page},classList:{toggle(){}},setAttribute(){}}));
+let saved=null;
+const c={console,Date,localStorage:{getItem:()=>null,setItem:(k,v)=>{saved=v}},document:{querySelectorAll:(q)=>q==='nav button'?nav:[],querySelector:(q)=>q.includes('input[name="lab-0"]')?{value:'1'}:null,getElementById:id=>els[id]||(els[id]={innerHTML:'',textContent:'',className:'',focus(){}})},window:{scrollTo(){},matchMedia:()=>({matches:false})}};
+vm.createContext(c);
+for(const file of ['app.js','chapters.js','roadmap.js','dashboard.js','features.js'])vm.runInContext(fs.readFileSync(file,'utf8'),c);
+assert.equal(vm.runInContext('certificationGuide.length',c),7);
+assert.equal(vm.runInContext('miniLabs.length',c),3);
+assert.equal(vm.runInContext('socMilestones.length',c),3);
+vm.runInContext("navigate('certifications')",c);
+assert.match(els.app.innerHTML,/Official source/);
+assert.match(els.app.innerHTML,/course-completion certificate/i);
+vm.runInContext("navigate('labs')",c);
+assert.match(els.app.innerHTML,/Linux authentication log triage/);
+vm.runInContext('gradeLab(0)',c);
+const progress=JSON.parse(saved);
+assert.equal(progress.labResults['linux-auth'].correct,true);
+vm.runInContext("navigate('daily')",c);
+assert.match(els.app.innerHTML,/A little practice/);
+console.log('PASS: certification guide; three safe labs; feedback; saved lab result; navigation compatibility');
+
